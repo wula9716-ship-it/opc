@@ -58,8 +58,8 @@ export default function NotificationCenter() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-12 w-96 p-4 z-40 animate-fade-in shadow-2xl rounded-2xl border border-white/[0.16] bg-dark-950" style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.65)' }}>
+          <div className="fixed inset-0 z-[98] bg-black/20" onClick={() => setOpen(false)} />
+          <div className="fixed right-4 top-14 w-96 p-4 z-[99] animate-fade-in shadow-2xl rounded-2xl border border-white/[0.16] bg-dark-950" style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.65)' }}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-dark-100">通知中心</h3>
               <span className="text-[10px] text-dark-300">真实调度事件</span>

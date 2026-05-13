@@ -166,6 +166,25 @@ export const PROVIDER_REGISTRY: ProviderConfig[] = [
     ],
   },
 
+  // ==================== 通用自定义 ====================
+  {
+    id: 'custom',
+    name: '自定义平台',
+    icon: '🔧',
+    description: '任何兼容 OpenAI 格式的 API，自行填写 Base URL、API Key 和模型',
+    baseUrl: '',
+    apiKeyPlaceholder: 'sk-... 或任意 Key',
+    apiKeyHeader: 'Authorization: Bearer {key}',
+    compatible: 'openai',
+    docsUrl: '',
+    defaultModel: '',
+    region: 'both',
+    features: { streaming: true, functionCalling: false, vision: false, maxContextWindow: 128000 },
+    models: [
+      { id: 'custom-model', name: '自定义模型', contextWindow: 128000, maxOutput: 4096, pricing: { input: 0, output: 0 }, capabilities: ['chat', 'code'] },
+    ],
+  },
+
   // ==================== 聚合平台 ====================
   {
     id: 'siliconflow',

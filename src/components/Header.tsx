@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react'
 import TaskForm from './TaskForm'
 import NotificationCenter from './NotificationCenter'
 import { createTask, loadSettings, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
-import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
+import { getDispatchStats, isAIProviderConfigured, createAndDispatch } from '@/lib/dispatch/dispatcher'
+import { useToast } from './Toast'
 
 export default function Header() {
+  const { toast } = useToast()
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskCount, setTaskCount] = useState(0)
   const [providerReady, setProviderReady] = useState(false)
@@ -74,7 +76,22 @@ export default function Header() {
       <TaskForm
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
-        onSubmit={(task) => createTask(task)}
+        onSubmit={(task) => {
+          // 始终保存到本地任务列表
+          createTask(task)
+
+          // 如果 AI 已接入，同时触发调度
+          if (isAIProviderConfigured()) {
+            try {
+              const dispatched = createAndDispatch(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
+              toast('任务已创建并分派', `「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务，正在调度 Agent 执行。`, 'success')
+            } catch (err) {
+              toast('任务已创建', `「${task.title}」已保存，但调度失败: ${err instanceof Error ? err.message : '未知错误'}`, 'warning')
+            }
+          } else {
+            toast('任务已创建', `「${task.title}」已保存。前往设置接入 AI 平台后可自动分派给 Agent。`, 'info')
+          }
+        }}
       />
     </>
   )

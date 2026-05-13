@@ -44,6 +44,7 @@ export default function SettingsPage() {
   const [selectedModel, setSelectedModel] = useState('')
   const [testResult, setTestResult] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [testMessage, setTestMessage] = useState('')
+  const [customModelInput, setCustomModelInput] = useState('')
   const [regionFilter, setRegionFilter] = useState<'all' | 'china' | 'global'>('all')
   const [mounted, setMounted] = useState(false)
 
@@ -65,6 +66,7 @@ export default function SettingsPage() {
     if (!provider) return
     setSetupProvider(id)
     setSelectedModel(model || provider.defaultModel)
+    setCustomModelInput(model || '')
     setBaseUrlInput(provider.baseUrl)
     setApiKeyInput('')
     setTestResult('idle')
@@ -324,9 +326,25 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="text-xs text-dark-200 mb-1.5 block font-medium">默认模型</label>
-                    <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)} className="w-full px-3 py-2.5 bg-dark-900 border border-white/[0.1] rounded-xl text-sm text-dark-100 focus:outline-none focus:border-accent-purple/50">
-                      {providerToSetup.models.map(model => <option key={model.id} value={model.id}>{model.name} ({model.id})</option>)}
-                    </select>
+                    {providerToSetup.id === 'custom' ? (
+                      <div className="space-y-2">
+                        <input
+                          value={customModelInput || selectedModel}
+                          onChange={e => { setCustomModelInput(e.target.value); setSelectedModel(e.target.value) }}
+                          placeholder="输入模型 ID，如 gpt-4o、MiLM-7B、doubao-pro"
+                          className="w-full px-3 py-2.5 bg-dark-900 border border-white/[0.1] rounded-xl text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:border-accent-purple/50 font-mono"
+                        />
+                        <div className="flex flex-wrap gap-1.5">
+                          {['gpt-4o', 'claude-3.5-sonnet', 'MiLM-7B', 'doubao-pro-32k', 'Baichuan4', 'yi-large'].map(s => (
+                            <button key={s} onClick={() => { setCustomModelInput(s); setSelectedModel(s) }} className="px-2 py-1 text-[10px] text-dark-300 bg-dark-800 hover:bg-dark-700 rounded-md border border-white/[0.06]">{s}</button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)} className="w-full px-3 py-2.5 bg-dark-900 border border-white/[0.1] rounded-xl text-sm text-dark-100 focus:outline-none focus:border-accent-purple/50">
+                        {providerToSetup.models.map(model => <option key={model.id} value={model.id}>{model.name} ({model.id})</option>)}
+                      </select>
+                    )}
                   </div>
                 </div>
 
