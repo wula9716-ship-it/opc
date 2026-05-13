@@ -262,10 +262,12 @@ ${result.slice(0, 1500)}
 async function processQueue(): Promise<void> {
   if (isProcessing) return
   isProcessing = true
+  console.log('[Executor] 开始处理执行队列')
 
   while (executionQueue.size > 0) {
     const entries = Array.from(executionQueue.entries())
     executionQueue.clear()
+    console.log(`[Executor] 队列中有 ${entries.length} 个子任务待执行`)
 
     await Promise.allSettled(
       entries.map(async ([key, controller]) => {
@@ -273,14 +275,14 @@ async function processQueue(): Promise<void> {
         if (controller.signal.aborted) return
 
         try {
+          console.log(`[Executor] 开始执行: ${subtaskId} (Agent: ${agentId})`)
           const result = await executeSubtask(taskId, { id: subtaskId } as Subtask, agentId)
+          console.log(`[Executor] 执行完成: ${subtaskId}, 结果长度: ${result.length}`)
           if (!controller.signal.aborted) {
             completeSubtask(taskId, subtaskId, agentId)
-            // 级联分派新就绪的子任务
             const task = getTask(taskId)
             if (task) dispatchReadySubtasks(taskId)
 
-            // 异步分析优化建议（不阻塞主流程）
             const task2 = getTask(taskId)
             const subtask = task2?.subtasks.find(s => s.id === subtaskId)
             if (task2 && subtask) {
@@ -288,13 +290,19 @@ async function processQueue(): Promise<void> {
             }
           }
         } catch (err) {
-          console.error(`子任务执行失败: ${subtaskId}`, err)
+          console.error(`[Executor] 子任务执行失败: ${subtaskId}`, err)
+          // 给用户看错误提示
+          if (typeof window !== 'undefined') {
+            const evt = new CustomEvent('opc-os-executor-error', { detail: { subtaskId, error: err instanceof Error ? err.message : String(err) } })
+            window.dispatchEvent(evt)
+          }
         }
       })
     )
   }
 
   isProcessing = false
+  console.log('[Executor] 队列处理完毕')
 }
 
 /**
@@ -313,13 +321,21 @@ export function submitForExecution(taskId: string, subtask: Subtask, agentId: st
  */
 export function executeAllPending(taskId: string): void {
   const task = getTask(taskId)
-  if (!task) return
+  if (!task) {
+    console.log('[Executor] executeAllPending: 任务不存在', taskId)
+    return
+  }
 
+  console.log(`[Executor] executeAllPending: 任务 ${taskId} 有 ${task.subtasks.length} 个子任务`)
+  let submitted = 0
   for (const subtask of task.subtasks) {
+    console.log(`[Executor] 子任务 ${subtask.id}: status=${subtask.status}, agent=${subtask.assignedAgentId}`)
     if (subtask.status === 'assigned' && subtask.assignedAgentId) {
       submitForExecution(taskId, subtask, subtask.assignedAgentId)
+      submitted++
     }
   }
+  console.log(`[Executor] 提交了 ${submitted} 个子任务到执行队列`)
 }
 
 /**

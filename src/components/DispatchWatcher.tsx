@@ -51,12 +51,24 @@ export default function DispatchWatcher() {
       }
     }
 
+    // 监听执行错误
+    const handleError = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      if (detail?.error) {
+        toast('❌ 执行出错', `子任务 ${detail.subtaskId}: ${detail.error}`, 'error', 8000)
+      }
+    }
+    window.addEventListener('opc-os-executor-error', handleError)
+
     // 初始化
     const events = getRecentEvents(1)
     if (events.length > 0) lastEventIdRef.current = events[0].id
 
     const interval = setInterval(poll, 3000)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('opc-os-executor-error', handleError)
+    }
   }, [toast])
 
   return null // 无 UI，纯逻辑
