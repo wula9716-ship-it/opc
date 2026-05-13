@@ -7,6 +7,8 @@ import { createClient, createClientWithConfig } from '@/lib/ai-providers/client'
 import { completeSubtask, getTask, dispatchReadySubtasks } from './dispatcher'
 import { getAgentCapability } from './agent-registry'
 import { logEvent } from './dispatcher'
+import { createSuggestion } from '@/lib/workspace-store'
+import type { OptimizationSuggestion } from '@/types'
 import type { Subtask, DispatchedTask } from './types'
 
 // Agent 角色描述，让 AI 知道自己是谁
@@ -153,6 +155,108 @@ async function executeSubtask(taskId: string, subtask: Subtask, agentId: string)
 }
 
 /**
+ * 让 AI 分析执行过程中发现的平台优化点
+ */
+async function analyzeOptimizations(
+  taskId: string,
+  subtaskId: string,
+  agentId: string,
+  subtaskTitle: string,
+  taskTitle: string,
+  result: string
+): Promise<void> {
+  const aiConfig = getAgentAIConfig(agentId)
+  if (!aiConfig) return
+
+  let providerForClient = aiConfig.providerId
+  if (providerForClient.startsWith('custom-')) providerForClient = 'openai'
+
+  const client = createClientWithConfig(aiConfig.apiKey, aiConfig.baseUrl, aiConfig.model)
+
+  const prompt = `你刚完成了「${subtaskTitle}」这个子任务（属于项目「${taskTitle}」）。
+
+你的工作产出摘要：
+${result.slice(0, 1500)}
+
+请从以下角度反思，这个项目/平台有没有可以优化的地方：
+1. 性能优化（加载速度、响应时间）
+2. 用户体验（交互设计、信息展示）
+3. 功能缺失（应该有但没有的功能）
+4. Bug 或异常（你遇到的问题）
+5. 架构改进（代码结构、数据流）
+6. 工作流优化（Agent 协作方式）
+
+请用 JSON 数组格式回答，每个优化点包含：
+- title: 简短标题
+- description: 详细描述（2-3句话）
+- category: performance/ux/feature/bug/architecture/workflow
+- priority: critical/high/medium/low
+- proposedSolution: 建议的解决方案
+- impact: 预期影响
+- effort: low/medium/high
+
+如果没有发现优化点，返回空数组 []。
+只返回 JSON，不要其他文字。`
+
+  try {
+    const response = await client.chat({
+      model: aiConfig.model,
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens: 2048,
+      temperature: 0.5,
+    })
+
+    // 解析 JSON 响应
+    let suggestions: Array<{
+      title: string
+      description: string
+      category: string
+      priority: string
+      proposedSolution: string
+      impact: string
+      effort: string
+    }> = []
+
+    try {
+      // 尝试从响应中提取 JSON
+      const jsonMatch = response.content.match(/\[[\s\S]*\]/)
+      if (jsonMatch) {
+        suggestions = JSON.parse(jsonMatch[0])
+      }
+    } catch {
+      // JSON 解析失败，跳过
+    }
+
+    // 保存优化建议
+    for (const s of suggestions) {
+      const validCategories = ['performance', 'ux', 'feature', 'bug', 'architecture', 'workflow']
+      const validPriorities = ['critical', 'high', 'medium', 'low']
+      const validEfforts = ['low', 'medium', 'high']
+
+      createSuggestion({
+        title: s.title,
+        description: s.description,
+        category: (validCategories.includes(s.category) ? s.category : 'feature') as OptimizationSuggestion['category'],
+        priority: (validPriorities.includes(s.priority) ? s.priority : 'medium') as OptimizationSuggestion['priority'],
+        source: agentId,
+        taskId,
+        subtaskId,
+        proposedSolution: s.proposedSolution,
+        impact: s.impact,
+        effort: (validEfforts.includes(s.effort) ? s.effort : 'medium') as OptimizationSuggestion['effort'],
+      })
+    }
+
+    if (suggestions.length > 0) {
+      logEvent('subtask_completed', taskId, subtaskId, agentId,
+        `发现 ${suggestions.length} 个优化建议`)
+    }
+  } catch {
+    // 优化分析失败不影响主流程
+  }
+}
+
+/**
  * 处理执行队列
  */
 async function processQueue(): Promise<void> {
@@ -175,6 +279,13 @@ async function processQueue(): Promise<void> {
             // 级联分派新就绪的子任务
             const task = getTask(taskId)
             if (task) dispatchReadySubtasks(taskId)
+
+            // 异步分析优化建议（不阻塞主流程）
+            const task2 = getTask(taskId)
+            const subtask = task2?.subtasks.find(s => s.id === subtaskId)
+            if (task2 && subtask) {
+              analyzeOptimizations(taskId, subtaskId, agentId, subtask.title, task2.title, result).catch(() => {})
+            }
           }
         } catch (err) {
           console.error(`子任务执行失败: ${subtaskId}`, err)

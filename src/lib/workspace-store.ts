@@ -1,9 +1,10 @@
-import type { MemoryEntry, Output, Task, TaskPriority } from '@/types'
+import type { MemoryEntry, Output, Task, TaskPriority, OptimizationSuggestion } from '@/types'
 
 const TASKS_KEY = 'opc-os-user-tasks'
 const OUTPUTS_KEY = 'opc-os-user-outputs'
 const MEMORY_KEY = 'opc-os-user-memory'
 const SETTINGS_KEY = 'opc-os-settings'
+const SUGGESTIONS_KEY = 'opc-os-suggestions'
 const DATA_CHANGED_EVENT = 'opc-os-data-changed'
 
 export interface UserSettings {
@@ -183,4 +184,38 @@ export function resetWorkspaceData(): void {
   saveTasks([])
   saveOutputs([])
   saveMemoryEntries([])
+  saveSuggestions([])
+}
+
+// ============ 优化建议 ============
+
+export function loadSuggestions(): OptimizationSuggestion[] {
+  return readJson<OptimizationSuggestion[]>(SUGGESTIONS_KEY, [])
+}
+
+export function saveSuggestions(suggestions: OptimizationSuggestion[]): void {
+  writeJson(SUGGESTIONS_KEY, suggestions)
+}
+
+export function createSuggestion(input: Omit<OptimizationSuggestion, 'id' | 'status' | 'createdAt' | 'updatedAt'>): OptimizationSuggestion {
+  const suggestion: OptimizationSuggestion = {
+    ...input,
+    id: makeId('opt'),
+    status: 'new',
+    createdAt: today(),
+    updatedAt: today(),
+  }
+  saveSuggestions([suggestion, ...loadSuggestions()])
+  return suggestion
+}
+
+export function updateSuggestionStatus(id: string, status: OptimizationSuggestion['status']): void {
+  const suggestions = loadSuggestions().map(s =>
+    s.id === id ? { ...s, status, updatedAt: today() } : s
+  )
+  saveSuggestions(suggestions)
+}
+
+export function removeSuggestion(id: string): void {
+  saveSuggestions(loadSuggestions().filter(s => s.id !== id))
 }

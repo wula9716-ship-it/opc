@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { getDispatchStats } from '@/lib/dispatch/dispatcher'
 import { getAllCapabilities } from '@/lib/dispatch/agent-registry'
 import { loadOutputs, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
+import OptimizationPanel from '@/components/OptimizationPanel'
 import type { Output, Task } from '@/types'
 
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color?: string }>; label?: string }) {
@@ -155,6 +156,9 @@ export default function AnalyticsPage() {
           </table>
         </div>
       </div>
+
+      {/* 优化建议 */}
+      <OptimizationPanel compact={false} maxItems={50} />
     </div>
   )
 }

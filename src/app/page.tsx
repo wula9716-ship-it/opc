@@ -7,6 +7,7 @@ import TaskTable from '@/components/TaskTable'
 import DiscussionFeed from '@/components/DiscussionFeed'
 import RecentOutputs from '@/components/RecentOutputs'
 import Suggestions from '@/components/Suggestions'
+import OptimizationPanel from '@/components/OptimizationPanel'
 import QuickDispatch from '@/components/QuickDispatch'
 import SystemPulse from '@/components/SystemPulse'
 import { loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
@@ -71,6 +72,9 @@ export default function Dashboard() {
         <DiscussionFeed />
         <RecentOutputs />
       </div>
+
+      {/* Optimization Suggestions */}
+      <OptimizationPanel compact={true} maxItems={5} />
 
       {/* Suggestions */}
       <Suggestions />

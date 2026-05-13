@@ -74,3 +74,25 @@ export interface Suggestion {
   icon: string
   action: string
 }
+
+// 优化建议
+export type OptSuggestionCategory = 'performance' | 'ux' | 'feature' | 'bug' | 'architecture' | 'workflow'
+export type OptSuggestionPriority = 'critical' | 'high' | 'medium' | 'low'
+export type OptSuggestionStatus = 'new' | 'accepted' | 'implementing' | 'done' | 'dismissed'
+
+export interface OptimizationSuggestion {
+  id: string
+  title: string
+  description: string
+  category: OptSuggestionCategory
+  priority: OptSuggestionPriority
+  status: OptSuggestionStatus
+  source: string // 哪个 Agent 提出的
+  taskId: string // 来自哪个任务
+  subtaskId?: string
+  proposedSolution: string
+  impact: string // 预期影响
+  effort: 'low' | 'medium' | 'high' // 实施难度
+  createdAt: string
+  updatedAt: string
+}
