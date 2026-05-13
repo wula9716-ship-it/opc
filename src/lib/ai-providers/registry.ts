@@ -230,6 +230,16 @@ export const PROVIDER_REGISTRY: ProviderConfig[] = [
   },
 ]
 
+// 动态注册自定义平台
+export function registerCustomProvider(config: ProviderConfig): void {
+  const existing = PROVIDER_REGISTRY.findIndex(p => p.id === config.id)
+  if (existing >= 0) {
+    PROVIDER_REGISTRY[existing] = config
+  } else {
+    PROVIDER_REGISTRY.push(config)
+  }
+}
+
 // 辅助函数
 export function getProvider(id: string): ProviderConfig | undefined {
   return PROVIDER_REGISTRY.find(p => p.id === id)
