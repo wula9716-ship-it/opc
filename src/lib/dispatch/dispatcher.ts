@@ -36,7 +36,7 @@ export function isAIProviderConfigured(): boolean {
 
 // ============ 事件和消息 ============
 
-function logEvent(type: DispatchEvent['type'], taskId: string, subtaskId: string | null, agentId: string | null, message: string, metadata: Record<string, unknown> = {}): DispatchEvent {
+export function logEvent(type: DispatchEvent['type'], taskId: string, subtaskId: string | null, agentId: string | null, message: string, metadata: Record<string, unknown> = {}): DispatchEvent {
   const evt: DispatchEvent = { id: nextEventId(), type, taskId, subtaskId, agentId, message, timestamp: new Date().toISOString(), metadata }
   eventLog.unshift(evt) // 最新的在前
   return evt

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import TaskForm from './TaskForm'
 import NotificationCenter from './NotificationCenter'
 import { createTask, loadSettings, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
-import { getDispatchStats, isAIProviderConfigured, createAndDispatch } from '@/lib/dispatch/dispatcher'
+import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
+import { createAndExecute } from '@/lib/dispatch/executor'
 import { useToast } from './Toast'
 
 export default function Header() {
@@ -83,8 +84,8 @@ export default function Header() {
           // 如果 AI 已接入，同时触发调度
           if (isAIProviderConfigured()) {
             try {
-              const dispatched = createAndDispatch(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
-              toast('任务已创建并分派', `「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务，正在调度 Agent 执行。`, 'success')
+              const dispatched = createAndExecute(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
+              toast('任务已创建并开始执行', `「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务，Agent 正在工作中...`, 'success')
             } catch (err) {
               toast('任务已创建', `「${task.title}」已保存，但调度失败: ${err instanceof Error ? err.message : '未知错误'}`, 'warning')
             }

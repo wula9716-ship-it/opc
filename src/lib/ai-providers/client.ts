@@ -440,3 +440,28 @@ export function createClient(providerId: string, apiKey: string, baseUrl?: strin
     apiKey,
   })
 }
+
+/**
+ * 直接用配置创建客户端（跳过 registry 查找）
+ * 用于自定义平台或动态配置
+ */
+export function createClientWithConfig(apiKey: string, baseUrl: string, model: string): AIClient {
+  return new AIClient({
+    provider: {
+      id: 'dynamic',
+      name: 'Dynamic',
+      icon: '🔧',
+      description: '',
+      baseUrl: baseUrl.trim(),
+      apiKeyPlaceholder: '',
+      apiKeyHeader: 'Authorization: Bearer {key}',
+      compatible: 'openai',
+      docsUrl: '',
+      defaultModel: model,
+      region: 'both',
+      features: { streaming: true, functionCalling: false, vision: false, maxContextWindow: 128000 },
+      models: [],
+    },
+    apiKey,
+  })
+}

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ModalProps {
   open: boolean
@@ -13,6 +14,9 @@ interface ModalProps {
 
 export default function Modal({ open, onClose, title, subtitle, children, maxWidth = 'max-w-lg' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     if (!open) return
@@ -27,12 +31,12 @@ export default function Modal({ open, onClose, title, subtitle, children, maxWid
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  if (!open) return null
+  if (!open || !mounted) return null
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in"
+      className="fixed inset-0 z-[99990] flex items-center justify-center animate-fade-in"
       style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
@@ -51,6 +55,7 @@ export default function Modal({ open, onClose, title, subtitle, children, maxWid
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

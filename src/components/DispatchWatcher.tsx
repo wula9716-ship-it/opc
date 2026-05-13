@@ -38,6 +38,9 @@ export default function DispatchWatcher() {
           case 'subtask_completed':
             toast('✅ 子任务完成', evt.message, 'success', 3000)
             break
+          case 'subtask_started':
+            toast('▶️ 开始执行', evt.message, 'info', 2000)
+            break
           case 'cascade_triggered':
             toast('⚡ 级联触发', evt.message, 'info', 3000)
             break
