@@ -1,0 +1,56 @@
+appId: com.opcos.desktop
+productName: OPC OS
+copyright: Copyright © 2026 OPC OS
+
+directories:
+  output: dist-electron
+  buildResources: build
+
+files:
+  - electron/**/*
+  - .next/**/*
+  - node_modules/**/*
+  - package.json
+  - next.config.ts
+  - public/**/*
+
+extraResources:
+  - from: ".next"
+    to: ".next"
+  - from: "public"
+    to: "public"
+  - from: "next.config.ts"
+    to: "next.config.ts"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+  artifactName: ${productName}-${version}-Setup.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: OPC OS
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: build/icon.icns
+  category: public.app-category.productivity
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  icon: build/icon.png
+  category: Office

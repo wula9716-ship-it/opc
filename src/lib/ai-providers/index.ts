@@ -1,0 +1,5 @@
+export * from './types'
+export { PROVIDER_REGISTRY, getProvider, getProvidersByRegion, getFreeModels } from './registry'
+export { AIClient, createClient } from './client'
+export { loadStore, saveStore, addProvider, removeProvider, setActiveProvider, toggleProvider, updateModel, getActiveProvider, getConfiguredProviders } from './store'
+export type { ProviderInstance, AIStore } from './store'
