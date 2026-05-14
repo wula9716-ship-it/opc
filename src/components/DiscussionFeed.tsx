@@ -3,17 +3,15 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getRecentEvents } from '@/lib/dispatch/dispatcher'
+import { useHeartbeat } from '@/lib/heartbeat'
 import type { DispatchEvent } from '@/lib/dispatch/types'
 
 export default function DiscussionFeed() {
   const [events, setEvents] = useState<DispatchEvent[]>([])
 
-  useEffect(() => {
-    const refresh = () => setEvents(getRecentEvents(6))
-    refresh()
-    const interval = window.setInterval(refresh, 3000)
-    return () => window.clearInterval(interval)
-  }, [])
+  useHeartbeat(() => {
+    setEvents(getRecentEvents(6))
+  })
 
   return (
     <div className="glass-card p-5 animate-fade-in stagger-4">

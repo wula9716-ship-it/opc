@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
+import { useHeartbeat } from '@/lib/heartbeat'
 
 export default function SystemPulse() {
   const [pulse, setPulse] = useState({
@@ -12,25 +13,16 @@ export default function SystemPulse() {
     completedSubtasks: 0,
   })
 
-  useEffect(() => {
-    const refresh = () => {
-      const stats = getDispatchStats()
-      setPulse({
-        providerReady: isAIProviderConfigured(),
-        totalTasks: stats.totalTasks,
-        runningSubtasks: stats.runningSubtasks,
-        queuedSubtasks: stats.queuedSubtasks,
-        completedSubtasks: stats.completedSubtasks,
-      })
-    }
-    refresh()
-    window.addEventListener('opc-os-ai-provider-changed', refresh)
-    const interval = window.setInterval(refresh, 3000)
-    return () => {
-      window.removeEventListener('opc-os-ai-provider-changed', refresh)
-      window.clearInterval(interval)
-    }
-  }, [])
+  useHeartbeat(() => {
+    const stats = getDispatchStats()
+    setPulse({
+      providerReady: isAIProviderConfigured(),
+      totalTasks: stats.totalTasks,
+      runningSubtasks: stats.runningSubtasks,
+      queuedSubtasks: stats.queuedSubtasks,
+      completedSubtasks: stats.completedSubtasks,
+    })
+  })
 
   return (
     <div className="glass-card p-5 animate-fade-in">

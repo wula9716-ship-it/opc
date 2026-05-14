@@ -5,6 +5,7 @@ import TaskForm from './TaskForm'
 import NotificationCenter from './NotificationCenter'
 import { loadSettings, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
 import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
+import { useHeartbeat } from '@/lib/heartbeat'
 
 export default function Header() {
   const [mounted, setMounted] = useState(false)
@@ -15,24 +16,19 @@ export default function Header() {
 
   useEffect(() => {
     setMounted(true)
-    const refresh = () => {
-      const localTasks = loadTasks()
-      const dispatchStats = getDispatchStats()
-      setTaskCount(localTasks.filter(task => task.status !== 'completed').length + dispatchStats.totalTasks)
-      setProviderReady(isAIProviderConfigured())
-      const settings = loadSettings()
-      setProfile({ name: settings.profileName, role: settings.profileRole })
-    }
-    refresh()
-    const unsubscribe = onWorkspaceDataChanged(refresh)
-    window.addEventListener('opc-os-ai-provider-changed', refresh)
-    const interval = window.setInterval(refresh, 3000)
-    return () => {
-      unsubscribe()
-      window.removeEventListener('opc-os-ai-provider-changed', refresh)
-      window.clearInterval(interval)
-    }
+    const unsubscribe = onWorkspaceDataChanged(() => {})
+    window.addEventListener('opc-os-ai-provider-changed', () => {})
+    return () => { unsubscribe() }
   }, [])
+
+  useHeartbeat(() => {
+    const localTasks = loadTasks()
+    const dispatchStats = getDispatchStats()
+    setTaskCount(localTasks.filter(task => task.status !== 'completed').length + dispatchStats.totalTasks)
+    setProviderReady(isAIProviderConfigured())
+    const settings = loadSettings()
+    setProfile({ name: settings.profileName, role: settings.profileRole })
+  })
 
   return (
     <>

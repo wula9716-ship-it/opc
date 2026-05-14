@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
-import { loadOutputs, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
+import { loadOutputs, loadTasks } from '@/lib/workspace-store'
+import { useHeartbeat } from '@/lib/heartbeat'
 import type { KPIData } from '@/types'
 
 const accentMap: Record<string, string> = {
@@ -36,16 +37,10 @@ export default function KPICards() {
 
   useEffect(() => {
     setMounted(true)
-    const refresh = () => setTick(t => t + 1)
-    const unsubscribe = onWorkspaceDataChanged(refresh)
-    window.addEventListener('opc-os-ai-provider-changed', refresh)
-    const interval = window.setInterval(refresh, 3000)
-    return () => {
-      unsubscribe()
-      window.removeEventListener('opc-os-ai-provider-changed', refresh)
-      window.clearInterval(interval)
-    }
+    return () => {}
   }, [])
+
+  useHeartbeat(() => setTick(t => t + 1))
 
   const kpiData = useMemo<KPIData[]>(() => {
     if (!mounted) return PLACEHOLDER

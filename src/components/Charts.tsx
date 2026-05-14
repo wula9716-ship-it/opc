@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { agents, roleCompositionData } from '@/lib/data'
-import { loadOutputs, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
+import { loadOutputs, loadTasks } from '@/lib/workspace-store'
 import { getDispatchStats } from '@/lib/dispatch/dispatcher'
+import { useHeartbeat } from '@/lib/heartbeat'
 
 type Slice = { name: string; value: number; color: string }
 
@@ -155,15 +156,7 @@ function buildOutputTrend() {
 export function ChartsRow() {
   const [tick, setTick] = useState(0)
 
-  useEffect(() => {
-    const refresh = () => setTick(t => t + 1)
-    const unsubscribe = onWorkspaceDataChanged(refresh)
-    const interval = window.setInterval(refresh, 3000)
-    return () => {
-      unsubscribe()
-      window.clearInterval(interval)
-    }
-  }, [])
+  useHeartbeat(() => setTick(t => t + 1))
 
   const { taskProgress, outputTrend } = useMemo(() => {
     void tick

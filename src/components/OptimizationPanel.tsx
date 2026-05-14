@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { loadSuggestions, updateSuggestionStatus, removeSuggestion } from '@/lib/workspace-store'
-import { onWorkspaceDataChanged } from '@/lib/workspace-store'
+import { useHeartbeat } from '@/lib/heartbeat'
 import type { OptimizationSuggestion } from '@/types'
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: string }> = {
@@ -39,15 +39,9 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
   const [filter, setFilter] = useState<'all' | 'new' | 'accepted'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  useEffect(() => {
-    const refresh = () => {
-      setSuggestions(loadSuggestions())
-    }
-    refresh()
-    const unsub = onWorkspaceDataChanged(refresh)
-    const interval = setInterval(refresh, 5000)
-    return () => { unsub(); clearInterval(interval) }
-  }, [])
+  useHeartbeat(() => {
+    setSuggestions(loadSuggestions())
+  })
 
   const filtered = suggestions
     .filter(s => filter === 'all' || s.status === filter)

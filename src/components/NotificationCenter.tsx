@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { getRecentEvents } from '@/lib/dispatch/dispatcher'
+import { useHeartbeat } from '@/lib/heartbeat'
 import type { DispatchEvent } from '@/lib/dispatch/types'
 
 const EVENT_ICONS: Record<string, string> = {
@@ -23,16 +24,12 @@ export default function NotificationCenter() {
   const btnRef = useRef<HTMLButtonElement>(null)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    const poll = () => {
-      const events = getRecentEvents(5)
-      setDispatchEvents(events)
-    }
-    poll()
-    const interval = setInterval(poll, 5000)
-    return () => clearInterval(interval)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
+
+  useHeartbeat(() => {
+    const events = getRecentEvents(5)
+    setDispatchEvents(events)
+  })
 
   const unreadCount = dispatchEvents.length
   const liveEvents = dispatchEvents.map((evt, i) => ({
