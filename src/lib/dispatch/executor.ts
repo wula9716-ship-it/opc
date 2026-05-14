@@ -267,6 +267,7 @@ async function processQueue(): Promise<void> {
     executionQueue.clear()
 
     // 通知开始执行
+    if (typeof window !== 'undefined') window.alert(`开始执行 ${entries.length} 个子任务`)
     logEvent('task_created', entries[0]?.[0]?.split('|')[0] || '', null, null,
       `开始执行 ${entries.length} 个子任务...`)
 
@@ -277,6 +278,7 @@ async function processQueue(): Promise<void> {
 
         try {
           const result = await executeSubtask(taskId, { id: subtaskId } as Subtask, agentId)
+          if (typeof window !== 'undefined') window.alert(`执行完成: ${subtaskId}`)
           if (!controller.signal.aborted) {
             completeSubtask(taskId, subtaskId, agentId)
             const task = getTask(taskId)
@@ -314,6 +316,7 @@ export function submitForExecution(taskId: string, subtask: Subtask, agentId: st
   if (executionQueue.has(key)) return
 
   executionQueue.set(key, new AbortController())
+  if (typeof window !== 'undefined') window.alert(`提交执行: ${subtask.title}`)
   processQueue()
 }
 
