@@ -84,17 +84,17 @@ export default function Header() {
           // 检查 AI 接入状态
           const aiReady = isAIProviderConfigured()
           if (!aiReady) {
-            toast('⚠️ AI 未接入', '任务已保存，但无法自动分派。请先去「设置 → AI 平台」接入一个平台（如小米 MiMo）。', 'warning', 8000)
+            alert('⚠️ AI 未接入！任务已保存，但无法自动分派。\n\n请先去「设置 → AI 平台」接入一个平台。')
             return
           }
 
           // 触发调度
           try {
             const dispatched = createAndExecute(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
-            toast('✅ 任务已创建并开始执行', `「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务，Agent 正在工作中...`, 'success')
+            alert(`✅ 任务已创建并开始执行！\n\n「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务。`)
           } catch (err) {
             const msg = err instanceof Error ? err.message : '未知错误'
-            toast('❌ 调度失败', msg, 'error', 10000)
+            alert(`❌ 调度失败: ${msg}`)
           }
         }}
       />
