@@ -175,7 +175,7 @@ async function processQueue(): Promise<void> {
           const result = await executeSubtask(taskId, subObj, agentId)
           const elapsed = ((Date.now() - t0) / 1000).toFixed(1)
           if (!controller.signal.aborted) {
-            completeSubtask(taskId, subtaskId, agentId)
+            completeSubtask(taskId, subtaskId, agentId, result)
             logEvent('subtask_completed', taskId, subtaskId, agentId,
               `「${subObj.title}」完成 (${elapsed}s)`)
             const updatedTask = getTask(taskId)

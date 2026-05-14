@@ -7,6 +7,7 @@ import { DispatchedTask, Subtask, DispatchEvent, AgentMessage, MatchScore, Skill
 import { decomposeTask, getReadySubtasks, updateTaskProgress } from './decomposer'
 import { matchAgents, findBestAgent, batchAssign } from './skill-matcher'
 import { updateAgentLoad, getAgentCapability } from './agent-registry'
+import type { Output, Task } from '@/types'
 
 // ============ 内存状态 ============
 
@@ -125,7 +126,7 @@ function assignSubtask(task: DispatchedTask, subtask: Subtask, agentId: string):
 /**
  * 标记子任务完成，触发级联分派
  */
-export function completeSubtask(taskId: string, subtaskId: string, agentId: string): void {
+export function completeSubtask(taskId: string, subtaskId: string, agentId: string, result?: string): void {
   const task = dispatchedTasks.get(taskId)
   if (!task) return
   const subtask = task.subtasks.find(s => s.id === subtaskId)
@@ -133,10 +134,30 @@ export function completeSubtask(taskId: string, subtaskId: string, agentId: stri
 
   subtask.status = 'completed'
   subtask.completedAt = new Date().toISOString()
-  subtask.result = `「${subtask.title}」已完成`
+  const resultContent = result || `「${subtask.title}」已完成`
+  subtask.result = resultContent
   subtask.actualMinutes = subtask.startedAt
     ? Math.round((Date.now() - new Date(subtask.startedAt).getTime()) / 60000)
     : null
+
+  // 创建产出
+  if (typeof window !== 'undefined') {
+    const { createOutput, loadTasks, saveTasks } = require('@/lib/workspace-store')
+    createOutput({
+      title: subtask.title,
+      type: 'report' as Output['type'],
+      format: 'text',
+    })
+    // 同步任务状态到任务列表
+    const tasks = loadTasks() as Task[]
+    const matched = tasks.find(t => t.title === task.title)
+    if (matched) {
+      const progress = task.subtasks.filter(s => s.status === 'completed').length / task.subtasks.length
+      matched.progress = Math.round(progress * 100)
+      matched.status = task.status === 'completed' ? 'completed' : progress > 0 ? 'in_progress' : 'pending'
+      saveTasks(tasks)
+    }
+  }
 
   updateAgentLoad(agentId, -1)
 
