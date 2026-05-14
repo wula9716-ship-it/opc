@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import Modal from './Modal'
+import { createTask } from '@/lib/workspace-store'
+import { isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
+import { createAndExecute } from '@/lib/dispatch/executor'
 
 interface TaskFormProps {
   open: boolean
@@ -32,13 +35,30 @@ export default function TaskForm({ open, onClose, onSubmit }: TaskFormProps) {
 
   const handleSubmit = () => {
     if (!title.trim()) return
-    onSubmit?.({ title: title.trim(), assignee, priority, dueDate, tags })
+    const taskData = { title: title.trim(), assignee, priority, dueDate, tags }
+    
+    createTask(taskData)
+    onClose()
+    
+    const aiReady = isAIProviderConfigured()
+    if (!aiReady) {
+      setTimeout(() => window.alert('AI not connected'), 200)
+      setTitle('')
+      return
+    }
+    
+    try {
+      const dispatched = createAndExecute(taskData.title, taskData.assignee + ' ' + taskData.priority)
+      setTimeout(() => window.alert('OK ' + dispatched.subtasks.length + ' subtasks'), 200)
+    } catch (err) {
+      setTimeout(() => window.alert('Err ' + (err instanceof Error ? err.message : 'unknown')), 200)
+    }
+    
     setTitle('')
     setAssignee(assignees[0].name)
     setPriority('medium')
     setDueDate('')
     setTags([])
-    onClose()
   }
 
   const toggleTag = (tag: string) => {

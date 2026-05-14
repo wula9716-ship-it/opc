@@ -77,11 +77,7 @@ export default function Header() {
       <TaskForm
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
-        onSubmit={(task) => {
-          document.title = 'onSubmit called: ' + task.title
-          createTask(task)
-          document.title = 'createTask done'
-        }}
+        onSubmit={undefined}
       />
     </>
   )
