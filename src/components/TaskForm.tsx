@@ -31,19 +31,8 @@ export default function TaskForm({ open, onClose, onSubmit }: TaskFormProps) {
   const [aiSuggest, setAiSuggest] = useState(false)
 
   const handleSubmit = () => {
-    if (!title.trim()) {
-      alert('标题为空')
-      return
-    }
-    alert('handleSubmit 被调用，标题: ' + title)
-    if (onSubmit) {
-      alert('onSubmit 存在，准备调用')
-      onSubmit({ title: title.trim(), assignee, priority, dueDate, tags })
-      alert('onSubmit 调用完成')
-    } else {
-      alert('onSubmit 不存在！')
-    }
-    // Reset
+    if (!title.trim()) return
+    onSubmit?.({ title: title.trim(), assignee, priority, dueDate, tags })
     setTitle('')
     setAssignee(assignees[0].name)
     setPriority('medium')
