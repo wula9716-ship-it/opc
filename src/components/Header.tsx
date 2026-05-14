@@ -78,9 +78,9 @@ export default function Header() {
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
         onSubmit={(task) => {
-          window.alert('Header onSubmit 开始')
+          document.title = 'onSubmit called: ' + task.title
           createTask(task)
-          window.alert('createTask 完成')
+          document.title = 'createTask done'
         }}
       />
     </>
