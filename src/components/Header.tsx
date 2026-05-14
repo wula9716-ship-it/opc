@@ -3,19 +3,18 @@
 import { useEffect, useState } from 'react'
 import TaskForm from './TaskForm'
 import NotificationCenter from './NotificationCenter'
-import { createTask, loadSettings, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
+import { loadSettings, loadTasks, onWorkspaceDataChanged } from '@/lib/workspace-store'
 import { getDispatchStats, isAIProviderConfigured } from '@/lib/dispatch/dispatcher'
-import { createAndExecute } from '@/lib/dispatch/executor'
-import { useToast } from './Toast'
 
 export default function Header() {
-  const { toast } = useToast()
+  const [mounted, setMounted] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskCount, setTaskCount] = useState(0)
   const [providerReady, setProviderReady] = useState(false)
   const [profile, setProfile] = useState({ name: '老板', role: '创始人 / CEO' })
 
   useEffect(() => {
+    setMounted(true)
     const refresh = () => {
       const localTasks = loadTasks()
       const dispatchStats = getDispatchStats()
@@ -45,8 +44,8 @@ export default function Header() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-60" />
               <span className="relative inline-flex rounded-full w-2 h-2 bg-accent-green" />
             </span>
-            <span className="text-sm text-dark-100">{providerReady ? 'AI 已接入' : '未接入 AI'}</span>
-            <span className="text-dark-300 text-sm font-medium">{taskCount} 个任务</span>
+            <span className="text-sm text-dark-100">{mounted ? (providerReady ? 'AI 已接入' : '未接入 AI') : '加载中...'}</span>
+            <span className="text-dark-300 text-sm font-medium">{mounted ? `${taskCount} 个任务` : ''}</span>
           </div>
           <div className="w-px h-4 bg-white/[0.06]" />
           <button
