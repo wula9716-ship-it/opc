@@ -9,6 +9,7 @@ export default function SystemPulse() {
     totalTasks: 0,
     runningSubtasks: 0,
     queuedSubtasks: 0,
+    completedSubtasks: 0,
   })
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function SystemPulse() {
         totalTasks: stats.totalTasks,
         runningSubtasks: stats.runningSubtasks,
         queuedSubtasks: stats.queuedSubtasks,
+        completedSubtasks: stats.completedSubtasks,
       })
     }
     refresh()
@@ -39,11 +41,12 @@ export default function SystemPulse() {
           {pulse.providerReady ? 'AI 可用' : '待接入'}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         {[
           { label: '调度任务', value: String(pulse.totalTasks), color: 'text-dark-100', icon: '📋' },
           { label: '执行中', value: String(pulse.runningSubtasks), color: 'text-accent-cyan', icon: '⚡' },
           { label: '排队', value: String(pulse.queuedSubtasks), color: 'text-dark-200', icon: '⏳' },
+          { label: '已完成', value: String(pulse.completedSubtasks), color: 'text-accent-green', icon: '✅' },
         ].map(item => (
           <div key={item.label} className="text-center rounded-xl bg-dark-900/60 border border-white/[0.08] py-3">
             <span className="text-base block mb-1 opacity-80">{item.icon}</span>

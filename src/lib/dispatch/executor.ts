@@ -168,12 +168,16 @@ async function processQueue(): Promise<void> {
         const [taskId, subtaskId, agentId] = key.split('|')
         if (controller.signal.aborted) return
         try {
+          const t0 = Date.now()
           const curTask = getTask(taskId)
           const subObj = curTask?.subtasks.find(s => s.id === subtaskId)
           if (!subObj) { throw new Error('子任务不存在') }
           const result = await executeSubtask(taskId, subObj, agentId)
+          const elapsed = ((Date.now() - t0) / 1000).toFixed(1)
           if (!controller.signal.aborted) {
             completeSubtask(taskId, subtaskId, agentId)
+            logEvent('subtask_completed', taskId, subtaskId, agentId,
+              `「${subObj.title}」完成 (${elapsed}s)`)
             const updatedTask = getTask(taskId)
             if (updatedTask) dispatchReadySubtasks(taskId)
             const updated = getTask(taskId)

@@ -117,10 +117,13 @@ export default function Sidebar() {
           <>
             <div className="flex items-center gap-2 text-xs text-dark-300"><span>🤖</span><span>{counts.aiReady ? 'AI 已接入' : 'AI 未接入'}</span></div>
             <div className="flex items-center gap-2 text-xs text-dark-300"><span>📋</span><span>{counts.tasks} 任务 · {counts.outputs} 产出</span></div>
-            <p className="text-[10px] text-dark-400 leading-relaxed">本地单机数据，不显示虚构运营指标。</p>
+            <button onClick={() => window.open('https://github.com/wula9716-ship-it/opc/issues/new?title=反馈', '_blank')} className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-dark-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors">💬 反馈问题</button>
           </>
         ) : (
-          <div className="flex flex-col items-center gap-1 text-[10px] text-dark-300"><span>{counts.aiReady ? '🟢' : '⚪'}</span></div>
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-[10px]">{counts.aiReady ? '🟢' : '⚪'}</span>
+            <button onClick={() => window.open('https://github.com/wula9716-ship-it/opc/issues/new?title=反馈', '_blank')} className="text-xs text-dark-400 hover:text-white transition-colors" title="反馈问题">💬</button>
+          </div>
         )}
       </div>
     </aside>
