@@ -78,27 +78,9 @@ export default function Header() {
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
         onSubmit={(task) => {
-          // 先检查 AI 状态，再保存任务
-          const aiReady = isAIProviderConfigured()
-
-          // 保存任务
+          window.alert('Header onSubmit 开始')
           createTask(task)
-
-          // 用 setTimeout 让调度在下一个事件循环执行，避免被重渲染冲掉
-          if (aiReady) {
-            setTimeout(() => {
-              try {
-                const dispatched = createAndExecute(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
-                window.alert(`✅ 任务已创建并开始执行！\n\n「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务。`)
-              } catch (err) {
-                window.alert(`❌ 调度失败: ${err instanceof Error ? err.message : '未知错误'}`)
-              }
-            }, 100)
-          } else {
-            setTimeout(() => {
-              window.alert('⚠️ AI 未接入！请先去「设置 → AI 平台」接入。')
-            }, 100)
-          }
+          window.alert('createTask 完成')
         }}
       />
     </>
