@@ -4,9 +4,8 @@
  */
 
 import { createClient, createClientWithConfig } from '@/lib/ai-providers/client'
-import { completeSubtask, getTask, dispatchReadySubtasks } from './dispatcher'
+import { createAndDispatch, completeSubtask, getTask, dispatchReadySubtasks, logEvent } from './dispatcher'
 import { getAgentCapability } from './agent-registry'
-import { logEvent } from './dispatcher'
 import { createSuggestion } from '@/lib/workspace-store'
 import type { OptimizationSuggestion } from '@/types'
 import type { Subtask, DispatchedTask } from './types'
@@ -336,7 +335,6 @@ export function executeAllPending(taskId: string): void {
  * 自动执行模式：创建任务后自动执行所有子任务
  */
 export function createAndExecute(title: string, description: string): DispatchedTask {
-  const { createAndDispatch } = require('./dispatcher')
   const task = createAndDispatch(title, description)
 
   // 延迟一下再执行，让 UI 先更新

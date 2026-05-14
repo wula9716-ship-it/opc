@@ -61,7 +61,22 @@ export default function NotificationCenter() {
     return () => window.removeEventListener('keydown', handler)
   }, [open])
 
-  const dropdown = open && mounted ? createPortal(
+  if (!mounted || typeof document === 'undefined') return (
+    <button
+      ref={btnRef}
+      onClick={() => setOpen(!open)}
+      className="relative p-2 text-dark-400 hover:text-dark-200 hover:bg-dark-700/50 rounded-lg transition-all"
+    >
+      <span className="text-lg">🔔</span>
+      {unreadCount > 0 && (
+        <span className="absolute top-1 right-1 w-4 h-4 bg-accent-red rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          {unreadCount}
+        </span>
+      )}
+    </button>
+  )
+
+  const dropdown = open ? createPortal(
     <>
       <div
         style={{ position: 'fixed', inset: 0, zIndex: 99998 }}

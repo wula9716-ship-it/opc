@@ -21,10 +21,21 @@ function getAccentColor(colorStr: string): string {
   return '#7c3aed'
 }
 
+const PLACEHOLDER: KPIData[] = [
+  { label: '任务', value: '-', subValue: '', icon: '📋', color: 'from-blue-500 to-blue-600' },
+  { label: 'AI 接入', value: '-', subValue: '', icon: '🤖', color: 'from-purple-500 to-purple-600' },
+  { label: '产出', value: '-', subValue: '', icon: '📦', color: 'from-cyan-500 to-cyan-600' },
+  { label: '进行中', value: '-', subValue: '', icon: '⚡', color: 'from-amber-500 to-amber-600' },
+  { label: '数据源', value: '-', subValue: '', icon: '📈', color: 'from-emerald-500 to-emerald-600' },
+  { label: '预算使用', value: '-', subValue: '', icon: '💰', color: 'from-pink-500 to-pink-600' },
+]
+
 export default function KPICards() {
+  const [mounted, setMounted] = useState(false)
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
+    setMounted(true)
     const refresh = () => setTick(t => t + 1)
     const unsubscribe = onWorkspaceDataChanged(refresh)
     window.addEventListener('opc-os-ai-provider-changed', refresh)
@@ -37,6 +48,7 @@ export default function KPICards() {
   }, [])
 
   const kpiData = useMemo<KPIData[]>(() => {
+    if (!mounted) return PLACEHOLDER
     void tick
     const tasks = loadTasks()
     const outputs = loadOutputs()
@@ -52,7 +64,7 @@ export default function KPICards() {
       { label: '数据源', value: '-', subValue: '未接入', icon: '📈', color: 'from-emerald-500 to-emerald-600' },
       { label: '预算使用', value: '¥0', subValue: '未产生调用', icon: '💰', color: 'from-pink-500 to-pink-600' },
     ]
-  }, [tick])
+  }, [mounted, tick])
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
