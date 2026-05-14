@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, Menu, nativeTheme } = require('electron')
+const { app, BrowserWindow, shell, Menu, nativeTheme, globalShortcut } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 
@@ -47,6 +47,14 @@ function createWindow() {
     mainWindow.show()
     if (isDev) {
       mainWindow.webContents.openDevTools({ mode: 'detach' })
+    }
+  })
+
+  // Ctrl+Shift+I 打开/关闭控制台
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.control && input.shift && input.key.toLowerCase() === 'i') {
+      mainWindow.webContents.toggleDevTools()
+      event.preventDefault()
     }
   })
 

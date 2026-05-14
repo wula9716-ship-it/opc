@@ -78,18 +78,25 @@ export default function Header() {
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
         onSubmit={(task) => {
+          console.log('[Header] 任务提交:', task)
           // 始终保存到本地任务列表
           createTask(task)
 
           // 如果 AI 已接入，同时触发调度
-          if (isAIProviderConfigured()) {
+          const aiReady = isAIProviderConfigured()
+          console.log('[Header] AI 已接入:', aiReady)
+          if (aiReady) {
             try {
+              console.log('[Header] 开始调用 createAndExecute')
               const dispatched = createAndExecute(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
+              console.log('[Header] 任务已调度，子任务数:', dispatched.subtasks.length)
               toast('任务已创建并开始执行', `「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务，Agent 正在工作中...`, 'success')
             } catch (err) {
-              toast('任务已创建', `「${task.title}」已保存，但调度失败: ${err instanceof Error ? err.message : '未知错误'}`, 'warning')
+              console.error('[Header] 调度失败:', err)
+              toast('调度失败', err instanceof Error ? err.message : '未知错误', 'error')
             }
           } else {
+            console.log('[Header] AI 未接入，跳过调度')
             toast('任务已创建', `「${task.title}」已保存。前往设置接入 AI 平台后可自动分派给 Agent。`, 'info')
           }
         }}
