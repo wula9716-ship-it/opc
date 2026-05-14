@@ -53,6 +53,13 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
     .filter(s => filter === 'all' || s.status === filter)
     .slice(0, maxItems)
 
+  // 清空所有建议
+  function clearAll() {
+    if (!window.confirm(`确定清空全部 ${suggestions.length} 条优化建议吗？导出后建议先保存文件。`)) return
+    for (const s of suggestions) removeSuggestion(s.id)
+    setSuggestions([])
+  }
+
   const newCount = suggestions.filter(s => s.status === 'new').length
 
   // 导出为 Markdown 文件
@@ -169,6 +176,9 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
           <span className="text-xs text-dark-400">Agent 在执行任务时自动发现</span>
           <button onClick={exportAsMarkdown} className="ml-auto px-4 py-2 text-xs font-medium text-white bg-accent-purple hover:bg-accent-purple/90 rounded-lg">
             📥 导出 Markdown
+          </button>
+          <button onClick={clearAll} className="px-4 py-2 text-xs font-medium text-accent-red bg-accent-red/10 hover:bg-accent-red/20 border border-accent-red/20 rounded-lg">
+            🗑️ 一键清空
           </button>
         </div>
         <div className="flex gap-1 p-0.5 bg-dark-800 rounded-lg border border-white/[0.08]">
