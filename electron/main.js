@@ -59,14 +59,16 @@ function createWindow() {
   })
 
   // CSP 安全策略
-  mainWindow.webContents.session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': ["default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://*.xiaomimimo.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://*.xiaomimimo.com ws://localhost:*"]
-      }
+  try {
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': ["default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://*.xiaomimimo.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://*.xiaomimimo.com ws://localhost:*"]
+        }
+      })
     })
-  })
+  } catch (e) { /* 非关键 */ }
 
   // 外部链接用默认浏览器打开
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
