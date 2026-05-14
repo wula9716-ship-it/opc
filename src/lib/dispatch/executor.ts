@@ -324,8 +324,12 @@ export function submitForExecution(taskId: string, subtask: Subtask, agentId: st
  * 批量提交所有已分配但未执行的子任务
  */
 export function executeAllPending(taskId: string): void {
+  if (typeof window !== 'undefined') window.alert('executeAllPending called: ' + taskId)
   const task = getTask(taskId)
-  if (!task) return
+  if (!task) {
+    if (typeof window !== 'undefined') window.alert('task not found!')
+    return
+  }
 
   for (const subtask of task.subtasks) {
     if (subtask.status === 'assigned' && subtask.assignedAgentId) {
@@ -338,10 +342,13 @@ export function executeAllPending(taskId: string): void {
  * 自动执行模式：创建任务后自动执行所有子任务
  */
 export function createAndExecute(title: string, description: string): DispatchedTask {
+  if (typeof window !== 'undefined') window.alert('createAndExecute start: ' + title)
   const task = createAndDispatch(title, description)
+  if (typeof window !== 'undefined') window.alert('task dispatched, id: ' + task.id)
 
   // 延迟一下再执行，让 UI 先更新
   setTimeout(() => {
+    if (typeof window !== 'undefined') window.alert('setTimeout fired for: ' + task.id)
     executeAllPending(task.id)
   }, 500)
 
