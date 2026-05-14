@@ -78,24 +78,13 @@ export default function Header() {
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
         onSubmit={(task) => {
-          // 始终保存到本地任务列表
-          createTask(task)
-
-          // 检查 AI 接入状态
-          const aiReady = isAIProviderConfigured()
-          if (!aiReady) {
-            alert('⚠️ AI 未接入！任务已保存，但无法自动分派。\n\n请先去「设置 → AI 平台」接入一个平台。')
+          try {
+            createTask(task)
+          } catch (e) {
+            alert('createTask 出错: ' + (e instanceof Error ? e.message : String(e)))
             return
           }
-
-          // 触发调度
-          try {
-            const dispatched = createAndExecute(task.title, `分派给: ${task.assignee}, 优先级: ${task.priority}`)
-            alert(`✅ 任务已创建并开始执行！\n\n「${task.title}」已拆解为 ${dispatched.subtasks.length} 个子任务。`)
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : '未知错误'
-            alert(`❌ 调度失败: ${msg}`)
-          }
+          alert('createTask 完成，准备检查 AI 状态')
         }}
       />
     </>
