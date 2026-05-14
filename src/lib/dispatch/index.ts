@@ -1,5 +1,5 @@
 export * from './types'
-export { createAndDispatch, getTask, getAllTasks, getTaskEvents, getRecentEvents, getTaskMessages, getAgentMessages, getMatchScores, getDispatchStats, dispatchReadySubtasks, completeSubtask, handoffSubtask, retrySubtask, reassignSubtask, cancelQueuedSubtasks } from './dispatcher'
+export { createAndDispatch, getTask, getAllTasks, getTaskEvents, getRecentEvents, getTaskMessages, getAgentMessages, getMatchScores, getDispatchStats, dispatchReadySubtasks, completeSubtask, handoffSubtask, retrySubtask, reassignSubtask, cancelQueuedSubtasks, cancelTask } from './dispatcher'
 export { matchAgents, findBestAgent, batchAssign } from './skill-matcher'
 export { decomposeTask, getReadySubtasks, updateTaskProgress } from './decomposer'
 export { getAllCapabilities, getAgentCapability, getOnlineAgents, getAgentsWithSkill, updateAgentLoad } from './agent-registry'

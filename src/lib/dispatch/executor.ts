@@ -223,11 +223,33 @@ export function createAndExecute(title: string, description: string): Dispatched
   return task
 }
 
+// 级联监听器管理
+const cascadeWatchers = new Map<string, ReturnType<typeof setInterval>>()
+
+// 监听取消事件
+if (typeof window !== 'undefined') {
+  window.addEventListener('opc-os-cancel-task', ((e: CustomEvent) => {
+    const taskId = e.detail.taskId
+    // 清除执行队列中该任务的所有子任务
+    for (const [key, controller] of executionQueue) {
+      if (key.startsWith(taskId + '|')) {
+        controller.abort()
+        executionQueue.delete(key)
+      }
+    }
+    // 停止级联监听器
+    const watcher = cascadeWatchers.get(taskId)
+    if (watcher) { clearInterval(watcher); cascadeWatchers.delete(taskId) }
+  }) as EventListener)
+}
+
 function startCascadeWatcher(taskId: string): void {
+  // 先清除旧的
+  stopCascadeWatcher(taskId)
   const interval = setInterval(() => {
     const task = getTask(taskId)
-    if (!task) { clearInterval(interval); return }
-    if (task.status === 'completed') { clearInterval(interval); return }
+    if (!task) { stopCascadeWatcher(taskId); return }
+    if (task.status === 'completed' || task.status === 'failed') { stopCascadeWatcher(taskId); return }
     for (const subtask of task.subtasks) {
       if (subtask.status === 'assigned' && subtask.assignedAgentId) {
         const key = `${taskId}|${subtask.id}|${subtask.assignedAgentId}`
@@ -235,5 +257,11 @@ function startCascadeWatcher(taskId: string): void {
       }
     }
   }, 3000)
-  setTimeout(() => clearInterval(interval), 30 * 60 * 1000)
+  cascadeWatchers.set(taskId, interval)
+  setTimeout(() => stopCascadeWatcher(taskId), 30 * 60 * 1000)
+}
+
+function stopCascadeWatcher(taskId: string): void {
+  const watcher = cascadeWatchers.get(taskId)
+  if (watcher) { clearInterval(watcher); cascadeWatchers.delete(taskId) }
 }

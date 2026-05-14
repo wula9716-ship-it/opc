@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createAndDispatch, getAllTasks, getRecentEvents, getTaskEvents, getTaskMessages, getDispatchStats, retrySubtask, reassignSubtask } from '@/lib/dispatch/dispatcher'
+import { createAndDispatch, getAllTasks, getRecentEvents, getTaskEvents, getTaskMessages, getDispatchStats, retrySubtask, reassignSubtask, cancelTask } from '@/lib/dispatch/dispatcher'
 import { DispatchedTask, DispatchEvent, Subtask } from '@/lib/dispatch/types'
 import { getAgentCapability, getAllCapabilities, getOnlineAgents } from '@/lib/dispatch/agent-registry'
 import TaskDAG from '@/components/TaskDAG'
@@ -111,6 +111,12 @@ export default function DispatchPage() {
                   <span className="text-[10px] text-dark-500">{task.progress}%</span>
                 </div>
                 <p className="text-[10px] text-dark-600 mt-1">{task.subtasks.length} 个子任务</p>
+                {task.status !== 'completed' && task.status !== 'failed' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); cancelTask(task.id); refresh() }}
+                    className="mt-2 w-full py-1 text-[10px] text-accent-red bg-accent-red/10 hover:bg-accent-red/20 rounded-lg transition-colors"
+                  >取消调度</button>
+                )}
               </button>
             ))}
           </div>
