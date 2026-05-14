@@ -170,8 +170,14 @@ export default function OutputsPage() {
               <div className="p-3 bg-dark-800 rounded-lg"><p className="text-dark-300">类型</p><p className="text-dark-100 mt-1">{selectedOutput.type}</p></div>
               <div className="p-3 bg-dark-800 rounded-lg"><p className="text-dark-300">格式</p><p className="text-dark-100 mt-1">{selectedOutput.format}</p></div>
               <div className="p-3 bg-dark-800 rounded-lg"><p className="text-dark-300">创建人</p><p className="text-dark-100 mt-1">{selectedOutput.createdBy}</p></div>
-              <div className="p-3 bg-dark-800 rounded-lg"><p className="text-dark-300">状态</p><p className="text-dark-100 mt-1">{statusLabels[selectedOutput.status]}</p></div>
+              <div className="p-3 bg-dark-800 rounded-lg"><p className="text-dark-300">大小</p><p className="text-dark-100 mt-1">{selectedOutput.size}</p></div>
             </div>
+            {selectedOutput.content && (
+              <div className="p-4 bg-dark-900/60 rounded-xl border border-white/[0.06] max-h-[400px] overflow-y-auto">
+                <p className="text-[10px] text-dark-400 mb-2">产出内容</p>
+                <div className="text-xs text-dark-100 whitespace-pre-wrap leading-relaxed">{selectedOutput.content}</div>
+              </div>
+            )}
             <div className="flex justify-end">
               <button onClick={deleteSelected} className="px-3 py-2 text-xs text-accent-red border border-accent-red/40 hover:bg-accent-red/10 rounded-lg">删除</button>
             </div>

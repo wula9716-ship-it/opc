@@ -30,6 +30,7 @@ export interface Output {
   title: string
   type: 'prd' | 'wireframe' | 'landing_page' | 'checklist' | 'dashboard' | 'report' | 'code'
   format: string
+  content?: string
   createdAt: string
   createdBy: string
   size: string

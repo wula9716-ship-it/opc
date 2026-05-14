@@ -145,8 +145,9 @@ export function completeSubtask(taskId: string, subtaskId: string, agentId: stri
     const { createOutput, loadTasks, saveTasks } = require('@/lib/workspace-store')
     createOutput({
       title: subtask.title,
-      type: 'report' as Output['type'],
+      type: 'report',
       format: 'text',
+      content: resultContent,
     })
     // 同步任务状态到任务列表
     const tasks = loadTasks() as Task[]

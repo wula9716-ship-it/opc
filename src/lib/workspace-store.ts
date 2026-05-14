@@ -122,16 +122,17 @@ export function saveOutputs(outputs: Output[]): void {
   writeJson(OUTPUTS_KEY, outputs)
 }
 
-export function createOutput(input: { title: string; type: string; format: string }): Output {
+export function createOutput(input: { title: string; type: string; format: string; content?: string }): Output {
   const output: Output = {
     id: makeId('output'),
     title: input.title,
     type: input.type as Output['type'],
     format: input.format,
+    content: input.content || '',
     createdAt: today(),
-    createdBy: '手动创建',
-    size: '-',
-    status: 'draft',
+    createdBy: 'AI Agent',
+    size: `${(input.content || '').length} 字`,
+    status: 'published',
   }
   saveOutputs([output, ...loadOutputs()])
   return output
