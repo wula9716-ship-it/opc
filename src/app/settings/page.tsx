@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { PROVIDER_REGISTRY, getFreeModels, getProvider } from '@/lib/ai-providers'
+import { PROVIDER_REGISTRY, getFreeModels, getProvider, registerCustomProvider } from '@/lib/ai-providers'
 import { createClient } from '@/lib/ai-providers/client'
 import type { AIStore } from '@/lib/ai-providers/store'
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, resetWorkspaceData, type UserSettings } from '@/lib/workspace-store'
@@ -158,7 +158,6 @@ export default function SettingsPage() {
       }
 
       // 动态注册到 registry
-      const { registerCustomProvider } = require('@/lib/ai-providers/registry')
       registerCustomProvider({
         id: customId,
         name: customName,

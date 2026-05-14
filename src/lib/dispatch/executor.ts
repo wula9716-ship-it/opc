@@ -157,6 +157,7 @@ ${result.slice(0, 1500)}
 async function processQueue(): Promise<void> {
   if (isProcessing) return
   isProcessing = true
+  try {
 
   while (executionQueue.size > 0) {
     const entries = Array.from(executionQueue.entries())
@@ -210,7 +211,9 @@ async function processQueue(): Promise<void> {
       })
     )
   }
-  isProcessing = false
+  } finally {
+    isProcessing = false
+  }
 }
 
 export function submitForExecution(taskId: string, subtask: Subtask, agentId: string): void {

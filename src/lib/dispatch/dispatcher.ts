@@ -8,6 +8,7 @@ import { decomposeTask, getReadySubtasks, updateTaskProgress } from './decompose
 import { matchAgents, findBestAgent, batchAssign } from './skill-matcher'
 import { updateAgentLoad, getAgentCapability } from './agent-registry'
 import type { Output, Task } from '@/types'
+import { createOutput, loadTasks, saveTasks } from '@/lib/workspace-store'
 
 // ============ 内存状态 ============
 
@@ -142,7 +143,6 @@ export function completeSubtask(taskId: string, subtaskId: string, agentId: stri
 
   // 创建产出
   if (typeof window !== 'undefined') {
-    const { createOutput, loadTasks, saveTasks } = require('@/lib/workspace-store')
     createOutput({
       title: subtask.title,
       type: 'report',
@@ -150,7 +150,7 @@ export function completeSubtask(taskId: string, subtaskId: string, agentId: stri
       content: resultContent,
     })
     // 同步任务状态到任务列表
-    const tasks = loadTasks() as Task[]
+    const tasks = loadTasks()
     const matched = tasks.find(t => t.title === task.title)
     if (matched) {
       const progress = task.subtasks.filter(s => s.status === 'completed').length / task.subtasks.length
@@ -260,8 +260,7 @@ export function cancelTask(taskId: string): number {
   // 同步到任务列表
   if (typeof window !== 'undefined') {
     try {
-      const { loadTasks, saveTasks } = require('@/lib/workspace-store')
-      const tasks = loadTasks() as Task[]
+      const tasks = loadTasks()
       const matched = tasks.find(t => t.title === task.title)
       if (matched) { matched.status = 'completed'; saveTasks(tasks) }
     } catch {}
