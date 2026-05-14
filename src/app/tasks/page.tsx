@@ -143,7 +143,7 @@ export default function TasksPage() {
         </div>
       )}
 
-      <TaskForm open={showForm} onClose={() => setShowForm(false)} onSubmit={(task) => { createTask(task); refresh() }} />
+      <TaskForm open={showForm} onClose={() => setShowForm(false)} />
 
       <Modal open={Boolean(selectedTask)} onClose={() => setSelectedTask(null)} title={selectedTask?.title || '任务详情'} subtitle="真实任务记录">
         {selectedTask && (

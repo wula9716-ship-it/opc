@@ -40,12 +40,8 @@ export default function TaskForm({ open, onClose }: TaskFormProps) {
 
     if (isAIProviderConfigured()) {
       try {
-        const dispatched = createAndExecute(taskData.title, `分派给: ${taskData.assignee}, 优先级: ${taskData.priority}`)
-        const statuses = dispatched.subtasks.map(s => `${s.title}: ${s.status}(${s.assignedAgentId || '无'})`).join('\n')
-        setTimeout(() => window.alert(`子任务状态:\n${statuses}`), 300)
-      } catch (err) {
-        setTimeout(() => window.alert('调度出错: ' + (err instanceof Error ? err.message : String(err))), 200)
-      }
+        createAndExecute(taskData.title, `分派给: ${taskData.assignee}, 优先级: ${taskData.priority}`)
+      } catch (_err) { /* 调度失败不阻塞 UI */ }
     }
 
     setTitle('')
@@ -66,14 +62,12 @@ export default function TaskForm({ open, onClose }: TaskFormProps) {
           <label className="text-xs text-dark-300 mb-1.5 block font-medium">任务标题</label>
           <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="输入任务描述..." className="w-full px-3 py-2.5 bg-dark-800/60 border border-white/[0.06] rounded-xl text-sm text-dark-200 placeholder-dark-600 focus:outline-none focus:border-accent-purple/40 transition-colors" autoFocus />
         </div>
-
         <label className="flex items-center gap-2 cursor-pointer">
           <div className={`w-9 h-5 rounded-full transition-colors relative ${aiSuggest ? 'bg-accent-purple' : 'bg-dark-600'}`} onClick={() => setAiSuggest(!aiSuggest)}>
             <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${aiSuggest ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </div>
           <span className="text-xs text-dark-300">让 AI 自动拆解子任务和估算工时</span>
         </label>
-
         <div>
           <label className="text-xs text-dark-300 mb-1.5 block font-medium">分派给</label>
           <div className="grid grid-cols-4 gap-2">
@@ -84,7 +78,6 @@ export default function TaskForm({ open, onClose }: TaskFormProps) {
             ))}
           </div>
         </div>
-
         <div>
           <label className="text-xs text-dark-300 mb-1.5 block font-medium">优先级</label>
           <div className="flex gap-2">
@@ -97,21 +90,18 @@ export default function TaskForm({ open, onClose }: TaskFormProps) {
             ))}
           </div>
         </div>
-
         <div>
           <label className="text-xs text-dark-300 mb-1.5 block font-medium">截止日期</label>
           <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="w-full px-3 py-2.5 bg-dark-800/60 border border-white/[0.06] rounded-xl text-sm text-dark-200 focus:outline-none focus:border-accent-purple/40 transition-colors" />
         </div>
-
         <div>
           <label className="text-xs text-dark-300 mb-1.5 block font-medium">标签</label>
-          <div className="flex flex-wrap gap-1.5">
+<div className="flex flex-wrap gap-1.5">
             {presetTags.map(tag => (
               <button key={tag} onClick={() => toggleTag(tag)} className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${tags.includes(tag) ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30' : 'bg-dark-700/60 text-dark-500 border border-white/[0.04] hover:text-dark-300'}`}>{tag}</button>
             ))}
           </div>
         </div>
-
         <div className="flex gap-2 pt-2">
           <button onClick={onClose} className="flex-1 py-2.5 text-xs font-medium text-dark-400 hover:text-dark-200 bg-dark-700/30 hover:bg-dark-700/50 rounded-xl transition-colors">取消</button>
           <button onClick={handleSubmit} disabled={!title.trim()} className="flex-1 py-2.5 text-xs font-medium text-accent-purple bg-accent-purple/15 hover:bg-accent-purple/25 border border-accent-purple/20 hover:border-accent-purple/30 rounded-xl transition-all disabled:opacity-40">创建任务</button>

@@ -77,7 +77,6 @@ export default function Header() {
       <TaskForm
         open={showTaskForm}
         onClose={() => setShowTaskForm(false)}
-        onSubmit={undefined}
       />
     </>
   )
