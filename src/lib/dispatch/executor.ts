@@ -189,8 +189,22 @@ async function processQueue(): Promise<void> {
         } catch (err) {
           const errorMsg = err instanceof Error ? err.message : String(err)
           logEvent('subtask_failed', taskId, subtaskId, agentId, `执行失败: ${errorMsg}`)
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('opc-os-executor-error', { detail: { subtaskId, error: errorMsg } }))
+
+          // 自动重试（最多2次）
+          const curTask = getTask(taskId)
+          const failedSub = curTask?.subtasks.find(s => s.id === subtaskId)
+          if (failedSub && failedSub.retryCount < failedSub.maxRetries) {
+            failedSub.retryCount++
+            failedSub.status = 'assigned'
+            logEvent('subtask_retried', taskId, subtaskId, agentId,
+              `自动重试 ${failedSub.retryCount}/${failedSub.maxRetries}: ${errorMsg}`)
+            if (!executionQueue.has(`${taskId}|${subtaskId}|${agentId}`)) {
+              submitForExecution(taskId, failedSub, agentId)
+            }
+          } else {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('opc-os-executor-error', { detail: { subtaskId, error: errorMsg } }))
+            }
           }
         }
       })
