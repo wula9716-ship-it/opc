@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import TaskForm from '@/components/TaskForm'
 import Modal from '@/components/Modal'
-import { createTask, loadTasks, onWorkspaceDataChanged, removeTask, updateTask } from '@/lib/workspace-store'
+import { loadTasks, onWorkspaceDataChanged, removeTask, updateTask } from '@/lib/workspace-store'
 import { getPriorityColor, getStatusBg } from '@/lib/utils'
 import type { Task, TaskStatus } from '@/types'
 
