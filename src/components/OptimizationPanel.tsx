@@ -55,6 +55,51 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
 
   const newCount = suggestions.filter(s => s.status === 'new').length
 
+  // 导出为 Markdown 文件
+  function exportAsMarkdown() {
+    const lines: string[] = [
+      '# OPC OS 优化建议',
+      '',
+      `> 共 ${suggestions.length} 条建议，导出时间：${new Date().toLocaleString('zh-CN')}`,
+      '',
+      '---',
+      '',
+    ]
+    for (const s of suggestions) {
+      const cat = CATEGORY_LABELS[s.category] || CATEGORY_LABELS.feature
+      const priorityLabel = { critical: '🔴 紧急', high: '🟠 高', medium: '🟡 中', low: '🟢 低' }[s.priority] || s.priority
+      const statusLabel = { new: '新发现', accepted: '已采纳', implementing: '实施中', done: '已完成', dismissed: '已忽略' }[s.status] || s.status
+      lines.push(
+        `## ${cat.icon} ${s.title}`,
+        '',
+        `- **分类**: ${cat.label}`,
+        `- **优先级**: ${priorityLabel}`,
+        `- **状态**: ${statusLabel}`,
+        `- **来源**: ${s.source} (任务: ${s.taskId})`,
+        `- **影响**: ${s.impact}`,
+        `- **实施难度**: ${s.effort === 'low' ? '低' : s.effort === 'medium' ? '中' : '高'}`,
+        '',
+        '### 描述',
+        '',
+        s.description,
+        '',
+        '### 建议方案',
+        '',
+        s.proposedSolution,
+        '',
+        '---',
+        '',
+      )
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `OPC-OS-优化建议-${new Date().toISOString().slice(0, 10)}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (compact) {
     // 仪表盘紧凑模式
     return (
@@ -68,6 +113,7 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
             )}
           </div>
           <a href="/analytics" className="text-[10px] text-accent-purple hover:text-accent-purple/80">查看全部 →</a>
+          <button onClick={exportAsMarkdown} className="text-[10px] px-2 py-1 bg-accent-purple/15 text-accent-purple hover:bg-accent-purple/25 rounded">📥 导出</button>
         </div>
 
         {filtered.length === 0 ? (
@@ -121,6 +167,9 @@ export default function OptimizationPanel({ compact = false, maxItems = 5 }: Pro
           <span className="text-xl">💡</span>
           <h2 className="text-base font-bold text-dark-100">优化建议</h2>
           <span className="text-xs text-dark-400">Agent 在执行任务时自动发现</span>
+          <button onClick={exportAsMarkdown} className="ml-auto px-4 py-2 text-xs font-medium text-white bg-accent-purple hover:bg-accent-purple/90 rounded-lg">
+            📥 导出 Markdown
+          </button>
         </div>
         <div className="flex gap-1 p-0.5 bg-dark-800 rounded-lg border border-white/[0.08]">
           {[
