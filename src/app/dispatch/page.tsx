@@ -115,7 +115,7 @@ export default function DispatchPage() {
                   <button
                     onClick={(e) => { e.stopPropagation(); cancelTask(task.id); refresh() }}
                     className="mt-2 w-full py-1 text-[10px] text-accent-red bg-accent-red/10 hover:bg-accent-red/20 rounded-lg transition-colors"
-                  >取消调度</button>
+                  >删除</button>
                 )}
               </button>
             ))}

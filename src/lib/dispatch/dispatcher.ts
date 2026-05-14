@@ -242,7 +242,7 @@ export function reassignSubtask(taskId: string, subtaskId: string, newAgentId: s
  * 批量取消任务的所有排队子任务
  */
 /**
- * 取消整个任务（包括运行中的子任务）
+ * 取消并删除整个任务
  */
 export function cancelTask(taskId: string): number {
   const task = dispatchedTasks.get(taskId)
@@ -253,17 +253,8 @@ export function cancelTask(taskId: string): number {
     window.dispatchEvent(new CustomEvent('opc-os-cancel-task', { detail: { taskId } }))
   }
 
-  let count = 0
-  for (const s of task.subtasks) {
-    if (s.status === 'queued' || s.status === 'assigned' || s.status === 'running') {
-      s.status = 'failed'
-      s.result = '已取消'
-      count++
-    }
-  }
-  task.status = 'failed'
-  updateTaskProgress(task)
-  logEvent('task_created', taskId, null, null, `任务「${task.title}」已取消 (${count} 个子任务)`)
+  const count = task.subtasks.filter(s => s.status !== 'completed').length
+  dispatchedTasks.delete(taskId)
 
   // 同步到任务列表
   if (typeof window !== 'undefined') {
@@ -271,7 +262,7 @@ export function cancelTask(taskId: string): number {
       const { loadTasks, saveTasks } = require('@/lib/workspace-store')
       const tasks = loadTasks() as Task[]
       const matched = tasks.find(t => t.title === task.title)
-      if (matched) { matched.status = 'blocked'; saveTasks(tasks) }
+      if (matched) { matched.status = 'completed'; saveTasks(tasks) }
     } catch {}
   }
 
