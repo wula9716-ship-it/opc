@@ -37,7 +37,7 @@ export default function Modal({ open, onClose, title, subtitle, children, maxWid
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[99990] flex items-center justify-center animate-fade-in"
-      style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.55)', backdropFilter: 'blur(2px)' }}
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       <div className={`w-full ${maxWidth} mx-4 glass-card p-6 animate-slide-up max-h-[85vh] overflow-y-auto`}>

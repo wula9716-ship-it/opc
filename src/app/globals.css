@@ -59,21 +59,21 @@ body {
 
 @layer components {
   .glass-card {
-    @apply backdrop-blur-xl border rounded-2xl;
+    @apply backdrop-blur-md border rounded-2xl;
     background: rgba(17, 24, 39, 0.92);
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-      0 4px 24px rgba(0, 0, 0, 0.2);
+      0 2px 14px rgba(0, 0, 0, 0.16);
   }
 
   .glass-card-hover {
-    @apply backdrop-blur-xl border rounded-2xl transition-all duration-300;
+    @apply backdrop-blur-md border rounded-2xl transition-all duration-300;
     background: rgba(17, 24, 39, 0.92);
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-      0 4px 24px rgba(0, 0, 0, 0.2);
+      0 2px 14px rgba(0, 0, 0, 0.16);
   }
 
   .glass-card-hover:hover {
@@ -81,20 +81,20 @@ body {
     background: rgba(30, 41, 59, 0.95);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(124, 58, 237, 0.06);
+      0 4px 18px rgba(0, 0, 0, 0.22),
+      0 0 0 1px rgba(124, 58, 237, 0.05);
     transform: translateY(-1px);
   }
 
   .kpi-card {
     @apply relative overflow-hidden;
     background: rgba(17, 24, 39, 0.92);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem;
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-      0 4px 20px rgba(0, 0, 0, 0.15);
+      0 2px 12px rgba(0, 0, 0, 0.12);
     padding: 1.25rem;
     transition: all 0.3s ease;
   }
@@ -103,8 +103,8 @@ body {
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-      0 8px 32px rgba(0, 0, 0, 0.25);
-    transform: translateY(-2px);
+      0 4px 18px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
   }
 
   .kpi-card::before {

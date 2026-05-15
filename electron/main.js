@@ -2,14 +2,8 @@ const { app, BrowserWindow, shell, Menu, nativeTheme, globalShortcut } = require
 const path = require('path')
 const { spawn } = require('child_process')
 
-// GPU 兼容：远程/无头环境下必须在 app ready 之前设置
-app.disableHardwareAcceleration()
-app.commandLine.appendSwitch('disable-gpu')
-app.commandLine.appendSwitch('disable-software-rasterizer')
+// 保留最小兼容项：默认开启硬件加速，避免毛玻璃/动画掉帧
 app.commandLine.appendSwitch('no-sandbox')
-app.commandLine.appendSwitch('disable-gpu-compositing')
-app.commandLine.appendSwitch('disable-gpu-sandbox')
-app.commandLine.appendSwitch('use-gl', 'swiftshader')
 
 // ============ 配置 ============
 
@@ -45,9 +39,6 @@ function createWindow() {
   // 窗口准备好后显示
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-    if (isDev) {
-      mainWindow.webContents.openDevTools({ mode: 'detach' })
-    }
   })
 
   // Ctrl+Shift+I 打开/关闭控制台

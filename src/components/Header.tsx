@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="h-14 border-b border-white/[0.08] flex items-center justify-between px-6 flex-shrink-0" style={{ background: 'rgba(10, 10, 30, 0.92)', backdropFilter: 'blur(16px)' }}>
+      <header className="h-14 border-b border-white/[0.08] flex items-center justify-between px-6 flex-shrink-0" style={{ background: 'rgba(10, 10, 30, 0.92)', backdropFilter: 'blur(8px)' }}>
         {/* Left side */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
