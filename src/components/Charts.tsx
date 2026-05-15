@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { agents, roleCompositionData } from '@/lib/data'
 import { loadOutputs, loadTasks } from '@/lib/workspace-store'
@@ -14,6 +14,15 @@ function EmptyBlock({ text }: { text: string }) {
     <div className="h-44 flex flex-col items-center justify-center rounded-xl border border-dashed border-white/[0.1] bg-dark-900/60 text-center">
       <p className="text-sm text-dark-200">{text}</p>
       <p className="text-xs text-dark-400 mt-1">有真实数据后这里会自动更新</p>
+    </div>
+  )
+}
+
+function ChartShell({ title }: { title: string }) {
+  return (
+    <div className="glass-card p-5 animate-fade-in stagger-2">
+      <h3 className="text-sm font-semibold text-dark-100 mb-4">{title}</h3>
+      <div className="h-44 rounded-xl bg-dark-900/40 border border-white/[0.06] animate-pulse" />
     </div>
   )
 }
@@ -155,10 +164,25 @@ function buildOutputTrend() {
 
 export function ChartsRow() {
   const [tick, setTick] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
-  useHeartbeat(() => setTick(t => t + 1))
+  useHeartbeat(() => {
+    setMounted(true)
+    setTick(t => t + 1)
+  })
 
   const { taskProgress, outputTrend } = useMemo(() => {
+    if (!mounted) {
+      return {
+        taskProgress: [
+          { name: '已完成', value: 0, color: '#10b981' },
+          { name: '进行中', value: 0, color: '#3b82f6' },
+          { name: '待开始', value: 0, color: '#f59e0b' },
+          { name: '已阻塞', value: 0, color: '#ef4444' },
+        ],
+        outputTrend: [] as { date: string; count: number }[],
+      }
+    }
     void tick
     const tasks = loadTasks()
     const dispatchStats = getDispatchStats()
@@ -171,7 +195,18 @@ export function ChartsRow() {
       ],
       outputTrend: buildOutputTrend(),
     }
-  }, [tick])
+  }, [mounted, tick])
+
+  if (!mounted) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <ChartShell title="任务进度" />
+        <ChartShell title="Agent 活跃度" />
+        <ChartShell title="Agent 角色模板" />
+        <ChartShell title="产出趋势" />
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
